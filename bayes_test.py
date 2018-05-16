@@ -52,13 +52,27 @@ for line in iris_object:
     else:
         virginica_item.append(item)
     item = []
+############ 拆分数据 #############
+sign = 0
+for i in range(10,45): #修改测试集和训练集的比例
+    item.append(setosa_item[i-sign])
+    item.append(versicolor_item[i-sign])
+    item.append(virginica_item[i-sign])
+    del setosa_item[i-sign]
+    del versicolor_item[i-sign]
+    del virginica_item[i-sign]
+    sign += 1
+##################################
 iris.D = len(setosa_item) + len(versicolor_item) + len(virginica_item)
+print("训练集")
 print(iris.D)
+print("测试集")
+print(len(item))
 #调用函数进行训练
 Train(iris,setosa_item,0)
 Train(iris,versicolor_item,1)
 Train(iris,virginica_item,2)
-print(iris.P_x_c)
+#print(iris.P_x_c)
 iris_object.close
 
 ########## test #########
@@ -73,23 +87,34 @@ def Comput_P(iris, item, label):
         P *= 1/(sqrt(2*3.1415926)*sqrt(iris.P_x_c[label-1][i][1]))*(exp(-((item[i]-iris.P_x_c[label-1][i][0])**2/(2*iris.P_x_c[label-1][i][1]))))
     return P
 
-iris_test = open('test.txt')
-item = []
-for line in iris_test:
-    for k in range(0,4):
-        item.append(float(line.split(',')[k]))
-    item.append(line.split(',')[4].strip())
-    P1 = Comput_P(iris, item, 1)
-    P2 = Comput_P(iris, item, 2)
-    P3 = Comput_P(iris, item, 3)
-    print(item)
+#iris_test = open('test.txt')
+#item = []
+#for line in iris_test:
+#    for k in range(0,4):
+    #    item.append(float(line.split(',')[k]))
+   # item.append(line.split(',')[4].strip())
+right = 0
+for i in item:
+    P1 = Comput_P(iris, i, 1)
+    P2 = Comput_P(iris, i, 2)
+    P3 = Comput_P(iris, i, 3)
+    #print(i)
     if P1 < P2:
         if P2 < P3:
-            print(" is Virginica")
+            #print(" is Virginica")
+            if i[4][5:] == "virginica":
+                right += 1
         else:
-            print(" is Versicolor")
+            #print(" is Versicolor")
+            if i[4][5:] == "versicolor":
+                right += 1
     elif P1 < P3:
-        print(" is Virginica")
+        #print(" is Virginica")
+        if i[4][5:] == "virginica":
+            right += 1
     else:
-        print(" is Setosa")
-    item = []
+        #print(" is Setosa")
+        if i[4][5:] == "setosa":
+            right += 1
+    #item = []
+print(right/len(item))
